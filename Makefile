@@ -32,7 +32,14 @@ install: manifests
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
-	kustomize build config/default | kubectl apply -f -
+	kustomize build config/default | kubectl create -f -
+
+debug: manifests
+	cd config/manager && kustomize edit set image controller=${IMG}
+	kustomize build config/debug | kubectl create -f -
+
+baremetal:
+	go run manager --mode=manager --manager-pod=baremetal --manager-namespace=operator-system --agent-image=jungler/controller:latest --agent-metrics-rbac=false
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen
@@ -53,6 +60,9 @@ generate: controller-gen
 # Build the docker image
 docker-build: test
 	docker build . -t ${IMG}
+
+docker-build-debug: test
+	docker build -f Dockerfile.debug . -t ${IMG}
 
 # Push the docker image
 docker-push:
