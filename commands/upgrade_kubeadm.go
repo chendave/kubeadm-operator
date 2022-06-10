@@ -17,12 +17,46 @@ limitations under the License.
 package commands
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"runtime"
+	"time"
+
 	"github.com/go-logr/logr"
+	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	operatorv1 "k8s.io/kubeadm/operator/api/v1alpha1"
 )
 
+const kubeadmDownloadPath = "https://storage.googleapis.com/kubernetes-release/release/%s/bin/linux/%s/kubeadm"
+
 func runUpgradeKubeadm(spec *operatorv1.UpgradeKubeadmCommandSpec, log logr.Logger) error {
-	log.WithValues("upgradekubeadm-dave", "upgradkubeadm").Info("upgrading kubeadm")
-	return nil
+	file, err := ioutil.TempFile(".", "upgrade.*.sh")
+	if err != nil {
+		log.Error(err, "Cannot create a temp file")
+	}
+	defer os.Remove(file.Name())
+
+	path := fmt.Sprintf(kubeadmDownloadPath, spec.Version, runtime.GOARCH)
+	script := "apt update && apt install wget -y \n" +
+		"wget " + path + " -O /usr/bin/kubeadm-" + spec.Version + "\n" +
+		"chmod +x /usr/bin/kubeadm-" + spec.Version + "\n" +
+		"cp -f /usr/bin/kubeadm-" + spec.Version + " /usr/bin/kubeadm"
+
+	_, err = file.Write([]byte(script))
+	if err != nil {
+		log.Error(err, "failed with creating the upgrade script")
+	}
+	err = wait.Poll(100*time.Millisecond, 30*time.Second, func() (bool, error) {
+		cmd := exec.Command("sh", file.Name())
+		_, err = cmd.Output()
+		if err != nil {
+			return false, errors.New("update failed with error: " + err.Error())
+		}
+		return true, nil
+	})
+	return err
 }

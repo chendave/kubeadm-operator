@@ -271,7 +271,13 @@ spec:
                                             type: object
                                           upgradeKubeadm:
                                             description: UpgradeKubeadmCommandSpec
-                                              provides...
+                                              provides kubeadm's target version to
+                                              upgrade.
+                                            properties:
+                                              version:
+                                                type: string
+                                            required:
+                                            - version
                                             type: object
                                           upgradeKubeletAndKubeactl:
                                             description: UpgradeKubeletAndKubeactlCommandSpec
@@ -393,12 +399,16 @@ spec:
                 properties:
                   cmd:
                     type: string
-                  version:
-                    description: Version specifies the target kubernetes version
+                  kubeadmVersion:
+                    description: KubeadmVersion specifies the target kubeadm version
+                    type: string
+                  kubernetesVersion:
+                    description: KubernetesVersion specifies the target kubernetes
+                      version
                     type: string
                 required:
                 - cmd
-                - version
+                - kubernetesVersion
                 type: object
             type: object
           status:
@@ -690,7 +700,13 @@ spec:
                               description: PreflightCommandSpec provides...
                               type: object
                             upgradeKubeadm:
-                              description: UpgradeKubeadmCommandSpec provides...
+                              description: UpgradeKubeadmCommandSpec provides kubeadm's
+                                target version to upgrade.
+                              properties:
+                                version:
+                                  type: string
+                              required:
+                              - version
                               type: object
                             upgradeKubeletAndKubeactl:
                               description: UpgradeKubeletAndKubeactlCommandSpec provides...
@@ -888,7 +904,13 @@ spec:
                       description: PreflightCommandSpec provides...
                       type: object
                     upgradeKubeadm:
-                      description: UpgradeKubeadmCommandSpec provides...
+                      description: UpgradeKubeadmCommandSpec provides kubeadm's target
+                        version to upgrade.
+                      properties:
+                        version:
+                          type: string
+                      required:
+                      - version
                       type: object
                     upgradeKubeletAndKubeactl:
                       description: UpgradeKubeletAndKubeactlCommandSpec provides...

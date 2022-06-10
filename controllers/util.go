@@ -148,12 +148,12 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 							},
 							Resources: corev1.ResourceRequirements{
 								Limits: corev1.ResourceList{
-									corev1.ResourceCPU:    resource.MustParse("100m"),
-									corev1.ResourceMemory: resource.MustParse("30Mi"),
+									corev1.ResourceCPU:    resource.MustParse("300m"),
+									corev1.ResourceMemory: resource.MustParse("100Mi"),
 								},
 								Requests: corev1.ResourceList{
-									corev1.ResourceCPU:    resource.MustParse("100m"),
-									corev1.ResourceMemory: resource.MustParse("20Mi"),
+									corev1.ResourceCPU:    resource.MustParse("300m"),
+									corev1.ResourceMemory: resource.MustParse("100Mi"),
 								},
 							},
 							SecurityContext: &corev1.SecurityContext{

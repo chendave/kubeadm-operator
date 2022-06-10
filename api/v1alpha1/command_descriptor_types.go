@@ -64,11 +64,9 @@ type PreflightCommandSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-// UpgradeKubeadmCommandSpec provides...
+// UpgradeKubeadmCommandSpec provides kubeadm's target version to upgrade.
 type UpgradeKubeadmCommandSpec struct {
-
-	// INSERT ADDITIONAL SPEC FIELDS -
-	// Important: Run "make" to regenerate code after modifying this file
+	Version string `json:"version"`
 }
 
 // KubeadmUpgradeApplyCommandSpec provides the binary and the target version to upgrade.

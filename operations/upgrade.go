@@ -29,12 +29,16 @@ func planUpgrade(operation *operatorv1.Operation, spec *operatorv1.UpgradeOperat
 
 	t1 := createBasicTaskGroup(operation, "01", "upgrade-cp-1")
 	setCP1Selector(&t1)
+	kubeadmVersion := spec.KubeadmVersion
+	if len(kubeadmVersion) == 0 {
+		kubeadmVersion = spec.KubernetesVersion
+	}
 	t1.Spec.Template.Spec.Commands = append(t1.Spec.Template.Spec.Commands,
 		operatorv1.CommandDescriptor{
-			UpgradeKubeadm: &operatorv1.UpgradeKubeadmCommandSpec{},
+			UpgradeKubeadm: &operatorv1.UpgradeKubeadmCommandSpec{Version: kubeadmVersion},
 		},
 		operatorv1.CommandDescriptor{
-			KubeadmUpgradeApply: &operatorv1.KubeadmUpgradeApplyCommandSpec{Version: spec.Version, Cmd: spec.Cmd},
+			KubeadmUpgradeApply: &operatorv1.KubeadmUpgradeApplyCommandSpec{Version: spec.KubernetesVersion, Cmd: spec.Cmd},
 		},
 		operatorv1.CommandDescriptor{
 			UpgradeKubeletAndKubeactl: &operatorv1.UpgradeKubeletAndKubeactlCommandSpec{},

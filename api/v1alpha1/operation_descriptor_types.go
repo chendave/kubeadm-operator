@@ -34,9 +34,12 @@ type OperatorDescriptor struct {
 
 // UpgradeOperationSpec provide declarative support for the kubeadm upgrade workflow.
 type UpgradeOperationSpec struct {
-	// Version specifies the target kubernetes version
-	Version string `json:"version"`
-	Cmd     string `json:"cmd"`
+	// KubernetesVersion specifies the target kubernetes version
+	KubernetesVersion string `json:"kubernetesVersion"`
+	// KubeadmVersion specifies the target kubeadm version
+	// +optional
+	KubeadmVersion string `json:"kubeadmVersion"`
+	Cmd            string `json:"cmd"`
 }
 
 // RenewCertificatesOperationSpec provide declarative support for the kubeadm upgrade workflow.

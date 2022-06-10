@@ -101,7 +101,13 @@ spec:
                       description: PreflightCommandSpec provides...
                       type: object
                     upgradeKubeadm:
-                      description: UpgradeKubeadmCommandSpec provides...
+                      description: UpgradeKubeadmCommandSpec provides kubeadm's target
+                        version to upgrade.
+                      properties:
+                        version:
+                          type: string
+                      required:
+                      - version
                       type: object
                     upgradeKubeletAndKubeactl:
                       description: UpgradeKubeletAndKubeactlCommandSpec provides...
