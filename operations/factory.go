@@ -40,7 +40,6 @@ func DaemonSetNodeSelectorLabels(operation *operatorv1.Operation) (map[string]st
 }
 
 // TaskGroupList return the list of TaskGroup to be performed by an operation
-// Dave ... here is the action needed.
 func TaskGroupList(operation *operatorv1.Operation) (*operatorv1.RuntimeTaskGroupList, error) {
 	if operation.Spec.RenewCertificates != nil {
 		return planRenewCertificates(operation, operation.Spec.RenewCertificates), nil

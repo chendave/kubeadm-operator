@@ -181,6 +181,14 @@ spec:
                               type: object
                             kubeadmRenewCertificates:
                               description: KubeadmRenewCertsCommandSpec provides...
+                              properties:
+                                args:
+                                  type: string
+                                cmd:
+                                  type: string
+                              required:
+                              - args
+                              - cmd
                               type: object
                             kubeadmUpgradeApply:
                               description: KubeadmUpgradeApplyCommandSpec provides...

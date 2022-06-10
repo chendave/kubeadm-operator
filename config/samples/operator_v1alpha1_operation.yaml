@@ -3,6 +3,6 @@ kind: Operation
 metadata:
   name: upgrade
 spec:
-  executionMode: Auto # Dave ... auto, pause, dryrun...
+  executionMode: DryRun # Dave ... auto, pause, dryrun...
   upgrade:
     kubernetesVersion: v1.16.0

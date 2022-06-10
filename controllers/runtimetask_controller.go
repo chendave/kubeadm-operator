@@ -239,7 +239,6 @@ func (r *RuntimeTaskReconciler) reconcileNormal(executionMode operatorv1.Operati
 
 	// Proceed with the current command execution
 	log.WithValues("Dave ... get into the command", task.Status.CurrentCommand).Info("running command")
-	log.Info("Dave ... hello there ...")
 	if executionMode == operatorv1.OperationExecutionModeDryRun {
 		// if dry running wait for an arbitrary delay so the user will get a better perception of the Task execution order
 		log.Info("Dave ... dry run... just return here")
@@ -258,7 +257,6 @@ func (r *RuntimeTaskReconciler) reconcileNormal(executionMode operatorv1.Operati
 		}
 
 		// execute the command
-		// Dave ... run the command, example "kubeadmRenewCertificates"
 		err := commandimpl.RunCommand(&task.Spec.Commands[index], log)
 
 		// if the command returned an error, return

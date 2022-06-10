@@ -81,9 +81,6 @@ func (r *RuntimeTaskGroupReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result,
 	}
 
 	// Ignore the TaskGroup if it is already completed or failed
-	log.Info("Dave... check the status of taskgroup.", "ct", taskgroup.Status.CompletionTime)
-	// Dave... duplicated called the create task due to this is not set as completed...
-	// and should avoid the create the task if it is already created...
 	if taskgroup.Status.CompletionTime != nil {
 		return ctrl.Result{}, nil
 	}
@@ -269,9 +266,7 @@ func (r *RuntimeTaskGroupReconciler) reconcileNormal(executionMode operatorv1.Op
 	return nil
 }
 
-// Dave(TODO): this task repica cannot be created and it's was created somewhere else... where?
 func (r *RuntimeTaskGroupReconciler) createTasksReplica(executionMode operatorv1.OperationExecutionMode, taskgroup *operatorv1.RuntimeTaskGroup, nodeName string) error {
-	r.Log.Info("Dave...renew1...Creating task replica...", "node", nodeName)
 
 	gv := operatorv1.GroupVersion
 

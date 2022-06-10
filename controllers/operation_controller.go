@@ -81,7 +81,6 @@ func (r *OperationReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rerr e
 	// Ignore the Operation if it is already completed or failed
 	if operation.Status.CompletionTime != nil {
 		// Reconcile the daemon set that deploys controller agents on nodes, so we are sure it is deleted after completion
-		// Dave ... daemonset with manager as the image should run all the nodes.
 		err := r.reconcileDaemonSet(operation, log)
 		if err != nil {
 			return ctrl.Result{}, err
@@ -138,10 +137,7 @@ func (r *OperationReconciler) reconcileDaemonSet(operation *operatorv1.Operation
 	}
 
 	// if operation running
-	log.WithValues("daemonset-dave", daemonSetName(operation.Name)).Info("creating DaemonSet")
 	image := r.AgentImage
-	log.WithValues("dave-namespace", r.ManagerNamespace).Info("checking namespace")
-	log.WithValues("dave-container", r.ManagerContainerName).Info("checking container")
 	if image == "" {
 		image, err = getImage(r.Client, r.ManagerNamespace, r.ManagerContainerName)
 		log.WithValues("dave-image", image).Info("checking image")
@@ -150,7 +146,6 @@ func (r *OperationReconciler) reconcileDaemonSet(operation *operatorv1.Operation
 		}
 	}
 
-	// Dave ... why create a daemonset here... (create the daemon when the controller is started on each each nodes)
 	if err := createDaemonSet(r.Client, operation, r.ManagerNamespace, image, r.MetricsRBAC); err != nil {
 		return err
 	}
@@ -172,14 +167,12 @@ func (r *OperationReconciler) reconcileOperation(operation *operatorv1.Operation
 	r.reconcileLabels(operation)
 
 	// Reconcile the daemon set that deploys controller agents on nodes
-	// Dave ... why do it again here... make sure the daemonset will always running there...
 	err = r.reconcileDaemonSet(operation, log)
 	if err != nil {
 		return
 	}
 
 	// Handle deleted Operation
-	// @TODO: How the Finalizers work here...
 	if !operation.DeletionTimestamp.IsZero() {
 		err = r.reconcileDelete(operation)
 		if err != nil {
@@ -228,7 +221,6 @@ func (r *OperationReconciler) reconcileLabels(operation *operatorv1.Operation) {
 func (r *OperationReconciler) reconcileTaskGroups(operation *operatorv1.Operation, log logr.Logger) (*taskGroupReconcileList, error) {
 	// gets all the desired TaskGroup objects for the current operation
 	// Nb. this is the domain knowledge encoded into operation implementations
-	// Dave ... desired is generated from the operation spec ... create taskgroup when listing the taskgroup
 	desired, err := operations.TaskGroupList(operation)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get desired TaskGroup list")
@@ -320,7 +312,6 @@ func (r *OperationReconciler) reconcileNormal(operation *operatorv1.Operation, t
 			// create the next TaskGroup in the ordered sequence
 			nextTaskGroup := taskGroups.tobeCreated[0].planned
 			log.WithValues("task-group", nextTaskGroup.Name).Info("creating task")
-			// Dave... operator created the taskgroup here...
 			err := r.Client.Create(context.Background(), nextTaskGroup)
 			if err != nil {
 				return errors.Wrap(err, "Failed to create TaskGroup")

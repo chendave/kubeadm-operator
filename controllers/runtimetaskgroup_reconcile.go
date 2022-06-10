@@ -76,14 +76,12 @@ func reconcileTaskGroups(desired *operatorv1.RuntimeTaskGroupList, current *oper
 		// NB. if there are more that one match, we track this, but this is an inconsistency
 		// (more that one Task for the same node)
 		if v, ok := matchMap[currentTaskGroup.Name]; ok {
-			// TODO: might be we want to check if the task was exactly the expected task
 			v.current = &currentTaskGroup
 			continue
 		}
 
 		// in case a current objects does not have desired object, we track this, but this is an inconsistency
 		// (a TaskGroup does not matching any desired TaskGroup)
-		// Dave ... seems like the current override the desired...???
 		matchMap[currentTaskGroup.Name] = newTaskGroupReconcileItem(nil, &currentTaskGroup)
 	}
 

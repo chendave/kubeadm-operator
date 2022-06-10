@@ -156,6 +156,7 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 								},
 							},
 							SecurityContext: &corev1.SecurityContext{
+								RunAsUser:  pointer.Int64Ptr(0),
 								Privileged: pointer.BoolPtr(true),
 							},
 							VolumeMounts: []corev1.VolumeMount{
@@ -277,7 +278,6 @@ func listTaskGroupsByLabels(c client.Client, labels map[string]string) (*operato
 	return taskdeployments, nil
 }
 
-// Dave ... only for event here...
 func recordPausedChange(recorder record.EventRecorder, obj runtime.Object, current, new bool, args ...string) {
 	if current != new {
 		reasonVerb := "Paused"

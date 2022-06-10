@@ -104,7 +104,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Dave... why the manger mode will create a daemonset and set with the nodename?
 	if managerMode(mode) == modeManager {
 		if err = (&controllers.OperationReconciler{
 			Client:               mgr.GetClient(),

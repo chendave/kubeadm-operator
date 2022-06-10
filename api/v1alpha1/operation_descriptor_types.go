@@ -43,9 +43,8 @@ type UpgradeOperationSpec struct {
 
 // RenewCertificatesOperationSpec provide declarative support for the kubeadm upgrade workflow.
 type RenewCertificatesOperationSpec struct {
-
-	// INSERT ADDITIONAL SPEC FIELDS -
-	// Important: Run "make" to regenerate code after modifying this file
+	Args string `json:"args"`
+	Cmd  string `json:"cmd"`
 }
 
 // CustomOperationSpec enable definition of custom list of RuntimeTaskGroup.

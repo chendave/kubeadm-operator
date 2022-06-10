@@ -108,9 +108,8 @@ type UpgradeKubeletAndKubeactlCommandSpec struct {
 
 // KubeadmRenewCertsCommandSpec provides...
 type KubeadmRenewCertsCommandSpec struct {
-
-	// INSERT ADDITIONAL SPEC FIELDS -
-	// Important: Run "make" to regenerate code after modifying this file
+	Args string `json:"args"`
+	Cmd  string `json:"cmd"`
 }
 
 // PassCommandSpec provide a dummy command for testing the kubeadm-operator workflow.
