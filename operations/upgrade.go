@@ -27,19 +27,15 @@ func setupUpgrade() map[string]string {
 func planUpgrade(operation *operatorv1.Operation, spec *operatorv1.UpgradeOperationSpec) *operatorv1.RuntimeTaskGroupList {
 	var items []operatorv1.RuntimeTaskGroup
 
-	//@TODO Dave ... hard-coded? need to auto-detect this...and create the taskgroup automatically.
-	//@TODO Dave ... verify this those command for the upgrade.
 	t1 := createBasicTaskGroup(operation, "01", "upgrade-cp-1")
 	setCP1Selector(&t1)
-	t1.Spec.NodeFilter = string(operatorv1.RuntimeTaskGroupNodeFilterHead)
 	t1.Spec.Template.Spec.Commands = append(t1.Spec.Template.Spec.Commands,
 		operatorv1.CommandDescriptor{
 			UpgradeKubeadm: &operatorv1.UpgradeKubeadmCommandSpec{},
 		},
 		operatorv1.CommandDescriptor{
-			KubeadmUpgradeApply: &operatorv1.KubeadmUpgradeApplyCommandSpec{},
+			KubeadmUpgradeApply: &operatorv1.KubeadmUpgradeApplyCommandSpec{Version: spec.Version, Cmd: spec.Cmd},
 		},
-		// @TODO ... Dave... if we are going to upgrade kubelet, how to make sure the service is restarted...
 		operatorv1.CommandDescriptor{
 			UpgradeKubeletAndKubeactl: &operatorv1.UpgradeKubeletAndKubeactlCommandSpec{},
 		},

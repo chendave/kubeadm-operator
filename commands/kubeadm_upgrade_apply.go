@@ -17,12 +17,20 @@ limitations under the License.
 package commands
 
 import (
+	"os/exec"
+
 	"github.com/go-logr/logr"
 
 	operatorv1 "k8s.io/kubeadm/operator/api/v1alpha1"
 )
 
 func runKubeadmUpgradeApply(spec *operatorv1.KubeadmUpgradeApplyCommandSpec, log logr.Logger) error {
-	log.WithValues("upgradeapply-dave", "upgradapply").Info("upgrading upgradapply")
-	return nil
+	cmd := exec.Command(spec.Cmd, "upgrade", "apply", spec.Version, "-y")
+	_, err := cmd.Output()
+	if err != nil {
+		log.Error(err, "fail to upgrade cluster", "target version", spec.Version)
+		return err
+	}
+	log.Info("Upgrade apply sucessfully executed")
+	return err
 }

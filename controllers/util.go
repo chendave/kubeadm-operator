@@ -130,6 +130,7 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 							Command: []string{
 								"/manager",
 							},
+							ImagePullPolicy: "IfNotPresent",
 							Args: []string{
 								"--mode=agent",
 								"--agent-node-name=$(MY_NODE_NAME)", // Dave... shouldn't this got passed directly?
@@ -168,6 +169,23 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 									Name:      "etc-kubernetes",
 									MountPath: "/etc/kubernetes",
 								},
+								{
+									Name:      "kubelet-pki",
+									MountPath: "/var/lib/kubelet/pki",
+								},
+								{
+									Name:      "crictl",
+									MountPath: "/usr/bin/crictl",
+								},
+								{
+									Name:      "dockershim",
+									MountPath: "/var/run/dockershim.sock",
+								},
+								// for etcd backup
+								{
+									Name:      "etcd",
+									MountPath: "/var/lib/etcd",
+								},
 							},
 						},
 					},
@@ -188,6 +206,42 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
 									Path: "/etc/kubernetes",
+									Type: hostPathTypePtr(corev1.HostPathDirectory),
+								},
+							},
+						},
+						{
+							Name: "kubelet-pki",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/var/lib/kubelet/pki",
+									Type: hostPathTypePtr(corev1.HostPathDirectory),
+								},
+							},
+						},
+						{
+							Name: "crictl",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/usr/bin/crictl",
+									Type: hostPathTypePtr(corev1.HostPathFile),
+								},
+							},
+						},
+						{
+							Name: "dockershim",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/var/run/dockershim.sock",
+									Type: hostPathTypePtr(corev1.HostPathSocket),
+								},
+							},
+						},
+						{
+							Name: "etcd",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/var/lib/etcd",
 									Type: hostPathTypePtr(corev1.HostPathDirectory),
 								},
 							},

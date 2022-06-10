@@ -234,7 +234,16 @@ spec:
                                             type: object
                                           kubeadmUpgradeApply:
                                             description: KubeadmUpgradeApplyCommandSpec
-                                              provides...
+                                              provides the binary and the target version
+                                              to upgrade.
+                                            properties:
+                                              cmd:
+                                                type: string
+                                              version:
+                                                type: string
+                                            required:
+                                            - cmd
+                                            - version
                                             type: object
                                           kubeadmUpgradeNode:
                                             description: KubeadmUpgradeNodeCommandSpec
@@ -376,12 +385,14 @@ spec:
                 description: Upgrade provide declarative support for the kubeadm upgrade
                   workflow.
                 properties:
-                  kubernetesVersion:
-                    description: KubernetesVersion specifies the target kubernetes
-                      version
+                  cmd:
+                    type: string
+                  version:
+                    description: Version specifies the target kubernetes version
                     type: string
                 required:
-                - kubernetesVersion
+                - cmd
+                - version
                 type: object
             type: object
           status:

@@ -71,11 +71,10 @@ type UpgradeKubeadmCommandSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-// KubeadmUpgradeApplyCommandSpec provides...
+// KubeadmUpgradeApplyCommandSpec provides the binary and the target version to upgrade.
 type KubeadmUpgradeApplyCommandSpec struct {
-
-	// INSERT ADDITIONAL SPEC FIELDS -
-	// Important: Run "make" to regenerate code after modifying this file
+	Version string `json:"version"`
+	Cmd     string `json:"cmd"`
 }
 
 // KubeadmUpgradeNodeCommandSpec provides...
