@@ -27,7 +27,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
-	"sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	operatorv1 "k8s.io/kubeadm/operator/api/v1alpha1"
 )
@@ -271,6 +271,7 @@ func TestOperationReconciler_Reconcile(t *testing.T) {
 	type args struct {
 		req ctrl.Request
 	}
+	ctx := context.Background()
 	tests := []struct {
 		name    string
 		fields  fields
@@ -349,7 +350,7 @@ func TestOperationReconciler_Reconcile(t *testing.T) {
 				Log:         log.Log,
 				recorder:    record.NewFakeRecorder(1),
 			}
-			got, err := r.Reconcile(tt.args.req)
+			got, err := r.Reconcile(ctx, tt.args.req)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Reconcile() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -533,7 +534,11 @@ func TestOperationReconciler_reconcileNormal(t *testing.T) {
 					},
 					tobeCreated: []*taskGroupReconcileItem{
 						{
-							planned: &operatorv1.RuntimeTaskGroup{},
+							planned: &operatorv1.RuntimeTaskGroup{
+								ObjectMeta: metav1.ObjectMeta{
+									Name: "FooTaskGroupInPlanned",
+								},
+							},
 						},
 					},
 				},

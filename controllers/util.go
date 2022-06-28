@@ -34,7 +34,6 @@ import (
 	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 
 	operatorv1 "k8s.io/kubeadm/operator/api/v1alpha1"
 	"k8s.io/kubeadm/operator/operations"
@@ -350,10 +349,10 @@ func recordPausedChange(recorder record.EventRecorder, obj runtime.Object, curre
 	}
 }
 
-func operationToTaskGroupRequests(c client.Client, o handler.MapObject) []ctrl.Request {
+func operationToTaskGroupRequests(c client.Client, o client.Object) []ctrl.Request {
 	var result []ctrl.Request
 
-	operation, ok := o.Object.(*operatorv1.Operation)
+	operation, ok := o.(*operatorv1.Operation)
 	if !ok {
 		return nil
 	}
@@ -452,10 +451,10 @@ func listTasksBySelector(c client.Client, selector *metav1.LabelSelector) (*oper
 	return tasks, nil
 }
 
-func taskGroupToTaskRequests(c client.Client, o handler.MapObject) []ctrl.Request {
+func taskGroupToTaskRequests(c client.Client, o client.Object) []ctrl.Request {
 	var result []ctrl.Request
 
-	taskgroup, ok := o.Object.(*operatorv1.RuntimeTaskGroup)
+	taskgroup, ok := o.(*operatorv1.RuntimeTaskGroup)
 	if !ok {
 		return nil
 	}

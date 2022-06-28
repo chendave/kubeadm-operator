@@ -24,8 +24,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-	"k8s.io/klog"
-	"k8s.io/klog/klogr"
+	klog "k8s.io/klog/v2"
+	"k8s.io/klog/v2/klogr"
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	operatorv1 "k8s.io/kubeadm/operator/api/v1alpha1"
@@ -94,10 +94,14 @@ func main() {
 		enableLeaderElection = false
 	}
 
+	// TODO: enable LeaderElection and delete this line
+	enableLeaderElection = false
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
+		LeaderElectionID:   "kubeadm-operator-lock",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

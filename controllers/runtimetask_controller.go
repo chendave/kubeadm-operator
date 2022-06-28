@@ -51,7 +51,7 @@ type RuntimeTaskReconciler struct {
 
 // SetupWithManager configures the controller for calling the reconciler
 func (r *RuntimeTaskReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	var mapFunc handler.ToRequestsFunc = func(o handler.MapObject) []reconcile.Request {
+	var mapFunc handler.MapFunc = func(o client.Object) []reconcile.Request {
 		return taskGroupToTaskRequests(r.Client, o)
 	}
 
@@ -59,7 +59,7 @@ func (r *RuntimeTaskReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&operatorv1.RuntimeTask{}).
 		Watches( // force reconcile Task every time the parent TaskGroup changes
 			&source.Kind{Type: &operatorv1.RuntimeTaskGroup{}},
-			&handler.EnqueueRequestsFromMapFunc{ToRequests: mapFunc},
+			handler.EnqueueRequestsFromMapFunc(mapFunc),
 		).
 		Complete(r)
 
@@ -68,8 +68,8 @@ func (r *RuntimeTaskReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 // Reconcile a runtimetask
-func (r *RuntimeTaskReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rerr error) {
-	ctx := context.Background()
+func (r *RuntimeTaskReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, rerr error) {
+	//ctx := context.Background()
 	log := r.Log.WithValues("task", req.NamespacedName)
 	log.Info("get into the task reconciler...")
 	// Fetch the Task instance

@@ -65,8 +65,7 @@ func (r *OperationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 // Reconcile an operation
-func (r *OperationReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rerr error) {
-	ctx := context.Background()
+func (r *OperationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, rerr error) {
 	log := r.Log.WithValues("operation", req.NamespacedName)
 
 	// Fetch the Operation instance

@@ -17,6 +17,7 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -28,7 +29,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
-	"sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"k8s.io/kubeadm/operator/errors"
 
@@ -275,7 +276,6 @@ func TestRuntimeTaskReconciler_reconcilePauseOverride(t *testing.T) {
 				NodeName:  "",
 				Operation: "",
 				recorder:  rec,
-				Log:       nil,
 			}
 
 			r.reconcilePauseOverride(tt.args.operationPaused, tt.args.task)
@@ -813,6 +813,7 @@ func TestRuntimeTaskReconciler_Reconcile(t *testing.T) {
 	type args struct {
 		req ctrl.Request
 	}
+	ctx := context.Background()
 	tests := []struct {
 		name    string
 		fields  fields
@@ -1085,7 +1086,7 @@ func TestRuntimeTaskReconciler_Reconcile(t *testing.T) {
 				recorder:  record.NewFakeRecorder(1),
 				Log:       log.Log,
 			}
-			got, err := r.Reconcile(tt.args.req)
+			got, err := r.Reconcile(ctx, tt.args.req)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Reconcile() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -1101,6 +1102,11 @@ func fixupWantTask(want *operatorv1.RuntimeTask, got *operatorv1.RuntimeTask) {
 	// In case want.StartTime is a marker, replace it with the current CompletionTime
 	if want.CreationTimestamp.IsZero() {
 		want.CreationTimestamp = got.CreationTimestamp
+	}
+
+	// ResourceVersion will be auto created by FakeClient, replace it with the current ResoureVersion
+	if want.ObjectMeta.ResourceVersion == "" {
+		want.ObjectMeta.ResourceVersion = got.ObjectMeta.ResourceVersion
 	}
 
 	// In case want.ErrorMessage is a marker, replace it with the current error

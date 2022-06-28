@@ -34,6 +34,10 @@ deploy: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
 	kustomize build config/default | kubectl create -f -
 
+# Undeploy Kubeadm operator
+undeploy:
+	kustomize build config/default | kubectl delete -f -
+
 debug: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
 	kustomize build config/debug | kubectl create -f -

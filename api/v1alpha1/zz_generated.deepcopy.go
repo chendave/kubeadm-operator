@@ -238,7 +238,7 @@ func (in *Operation) DeepCopyObject() runtime.Object {
 func (in *OperationList) DeepCopyInto(out *OperationList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]Operation, len(*in))
@@ -448,7 +448,7 @@ func (in *RuntimeTaskGroup) DeepCopyObject() runtime.Object {
 func (in *RuntimeTaskGroupList) DeepCopyInto(out *RuntimeTaskGroupList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]RuntimeTaskGroup, len(*in))
@@ -531,7 +531,7 @@ func (in *RuntimeTaskGroupStatus) DeepCopy() *RuntimeTaskGroupStatus {
 func (in *RuntimeTaskList) DeepCopyInto(out *RuntimeTaskList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]RuntimeTask, len(*in))
