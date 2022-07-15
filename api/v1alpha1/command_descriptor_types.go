@@ -96,11 +96,11 @@ type KubectlUncordonCommandSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-// UpgradeKubeletAndKubeactlCommandSpec provides...
+// UpgradeKubeletAndKubeactlCommandSpec provides target version to upgrade to.
 type UpgradeKubeletAndKubeactlCommandSpec struct {
-
-	// INSERT ADDITIONAL SPEC FIELDS -
-	// Important: Run "make" to regenerate code after modifying this file
+	KubeletVersion string `json:"kubeletVersion"`
+	KubectlVersion string `json:"kubectlVersion"`
+	NodeIP         string `json:"nodeIP"`
 }
 
 // KubeadmRenewCertsCommandSpec provides...

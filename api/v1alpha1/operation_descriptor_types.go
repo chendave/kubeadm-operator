@@ -39,7 +39,15 @@ type UpgradeOperationSpec struct {
 	// KubeadmVersion specifies the target kubeadm version
 	// +optional
 	KubeadmVersion string `json:"kubeadmVersion"`
+	// KubeletVersion specifies the target kubelet version
+	// +optional
+	KubeletVersion string `json:"kubeletVersion"`
+	// KubectlVersion specifies the target kubectl version
+	// +optional
+	KubectlVersion string `json:"kubectlVersion"`
 	Cmd            string `json:"cmd"`
+	// NodeIP is the IP address of the host IP.
+	NodeIP string `json:"nodeIP"`
 }
 
 // RenewCertificatesOperationSpec provide declarative support for the kubeadm upgrade workflow.

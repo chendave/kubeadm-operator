@@ -275,7 +275,18 @@ spec:
                                             type: object
                                           upgradeKubeletAndKubeactl:
                                             description: UpgradeKubeletAndKubeactlCommandSpec
-                                              provides...
+                                              provides target version to upgrade to.
+                                            properties:
+                                              kubectlVersion:
+                                                type: string
+                                              kubeletVersion:
+                                                type: string
+                                              nodeIP:
+                                                type: string
+                                            required:
+                                            - kubectlVersion
+                                            - kubeletVersion
+                                            - nodeIP
                                             type: object
                                           wait:
                                             description: Wait pauses the execution
@@ -396,13 +407,23 @@ spec:
                   kubeadmVersion:
                     description: KubeadmVersion specifies the target kubeadm version
                     type: string
+                  kubectlVersion:
+                    description: KubectlVersion specifies the target kubectl version
+                    type: string
+                  kubeletVersion:
+                    description: KubeletVersion specifies the target kubelet version
+                    type: string
                   kubernetesVersion:
                     description: KubernetesVersion specifies the target kubernetes
                       version
                     type: string
+                  nodeIP:
+                    description: NodeIP is the IP address of the host IP.
+                    type: string
                 required:
                 - cmd
                 - kubernetesVersion
+                - nodeIP
                 type: object
             type: object
           status:

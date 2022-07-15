@@ -30,8 +30,17 @@ func planUpgrade(operation *operatorv1.Operation, spec *operatorv1.UpgradeOperat
 	t1 := createBasicTaskGroup(operation, "01", "upgrade-cp-1")
 	setCP1Selector(&t1)
 	kubeadmVersion := spec.KubeadmVersion
+	kubectlVersion := spec.KubectlVersion
+	kubeletVersion := spec.KubeletVersion
+	nodeIP := spec.NodeIP
 	if len(kubeadmVersion) == 0 {
 		kubeadmVersion = spec.KubernetesVersion
+	}
+	if len(kubectlVersion) == 0 {
+		kubectlVersion = spec.KubernetesVersion
+	}
+	if len(kubeletVersion) == 0 {
+		kubeletVersion = spec.KubernetesVersion
 	}
 	t1.Spec.Template.Spec.Commands = append(t1.Spec.Template.Spec.Commands,
 		operatorv1.CommandDescriptor{
@@ -41,7 +50,11 @@ func planUpgrade(operation *operatorv1.Operation, spec *operatorv1.UpgradeOperat
 			KubeadmUpgradeApply: &operatorv1.KubeadmUpgradeApplyCommandSpec{Version: spec.KubernetesVersion, Cmd: spec.Cmd},
 		},
 		operatorv1.CommandDescriptor{
-			UpgradeKubeletAndKubeactl: &operatorv1.UpgradeKubeletAndKubeactlCommandSpec{},
+			UpgradeKubeletAndKubeactl: &operatorv1.UpgradeKubeletAndKubeactlCommandSpec{
+				KubeletVersion: kubeletVersion,
+				KubectlVersion: kubectlVersion,
+				NodeIP:         nodeIP,
+			},
 		},
 	)
 	items = append(items, t1)
@@ -56,7 +69,11 @@ func planUpgrade(operation *operatorv1.Operation, spec *operatorv1.UpgradeOperat
 			KubeadmUpgradeNode: &operatorv1.KubeadmUpgradeNodeCommandSpec{},
 		},
 		operatorv1.CommandDescriptor{
-			UpgradeKubeletAndKubeactl: &operatorv1.UpgradeKubeletAndKubeactlCommandSpec{},
+			UpgradeKubeletAndKubeactl: &operatorv1.UpgradeKubeletAndKubeactlCommandSpec{
+				KubeletVersion: kubeletVersion,
+				KubectlVersion: kubectlVersion,
+				NodeIP:         nodeIP,
+			},
 		},
 	)
 	items = append(items, t2)
@@ -74,7 +91,11 @@ func planUpgrade(operation *operatorv1.Operation, spec *operatorv1.UpgradeOperat
 			KubeadmUpgradeNode: &operatorv1.KubeadmUpgradeNodeCommandSpec{},
 		},
 		operatorv1.CommandDescriptor{
-			UpgradeKubeletAndKubeactl: &operatorv1.UpgradeKubeletAndKubeactlCommandSpec{},
+			UpgradeKubeletAndKubeactl: &operatorv1.UpgradeKubeletAndKubeactlCommandSpec{
+				KubeletVersion: kubeletVersion,
+				KubectlVersion: kubectlVersion,
+				NodeIP:         nodeIP,
+			},
 		},
 		operatorv1.CommandDescriptor{
 			KubectlUncordon: &operatorv1.KubectlUncordonCommandSpec{},

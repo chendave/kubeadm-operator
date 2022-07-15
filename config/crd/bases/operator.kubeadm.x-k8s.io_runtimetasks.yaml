@@ -110,7 +110,19 @@ spec:
                       - version
                       type: object
                     upgradeKubeletAndKubeactl:
-                      description: UpgradeKubeletAndKubeactlCommandSpec provides...
+                      description: UpgradeKubeletAndKubeactlCommandSpec provides target
+                        version to upgrade to.
+                      properties:
+                        kubectlVersion:
+                          type: string
+                        kubeletVersion:
+                          type: string
+                        nodeIP:
+                          type: string
+                      required:
+                      - kubectlVersion
+                      - kubeletVersion
+                      - nodeIP
                       type: object
                     wait:
                       description: Wait pauses the execution on the next command for

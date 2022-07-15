@@ -5,6 +5,10 @@ metadata:
 spec:
   executionMode: Auto
   upgrade:
-    kubernetesVersion: v1.24.1
-    kubeadmVersion: v1.24.1
+    kubernetesVersion: v1.23.2
+    kubeadmVersion: v1.23.2
+    kubeletVersion: v1.23.2
+    #kubectlVersion: v1.24.1
+    kubectlVersion: v1.23.2
+    nodeIP: 10.169.180.51
     cmd: kubeadm

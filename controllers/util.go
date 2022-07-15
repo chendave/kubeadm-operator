@@ -165,6 +165,14 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 									MountPath: "/usr/bin/kubeadm",
 								},
 								{
+									Name:      "kubelet-binary",
+									MountPath: "/usr/bin/kubelet",
+								},
+								{
+									Name:      "kubectl-binary",
+									MountPath: "/usr/bin/kubectl",
+								},
+								{
 									Name:      "etc-kubernetes",
 									MountPath: "/etc/kubernetes",
 								},
@@ -180,10 +188,22 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 									Name:      "dockershim",
 									MountPath: "/var/run/dockershim.sock",
 								},
+								{
+									Name:      "dockersocket",
+									MountPath: "/var/run/docker.sock",
+								},
 								// for etcd backup
 								{
 									Name:      "etcd",
 									MountPath: "/var/lib/etcd",
+								},
+								{
+									Name:      "docker",
+									MountPath: "/usr/bin/docker",
+								},
+								{
+									Name:      "ssh-secret",
+									MountPath: "/root/.ssh",
 								},
 							},
 						},
@@ -196,6 +216,24 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
 									Path: "/usr/bin/kubeadm",
+									Type: hostPathTypePtr(corev1.HostPathFile),
+								},
+							},
+						},
+						{
+							Name: "kubectl-binary",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/usr/bin/kubectl",
+									Type: hostPathTypePtr(corev1.HostPathFile),
+								},
+							},
+						},
+						{
+							Name: "kubelet-binary",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/usr/bin/kubelet",
 									Type: hostPathTypePtr(corev1.HostPathFile),
 								},
 							},
@@ -227,11 +265,31 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 								},
 							},
 						},
+						// for the upgrade before 1.24
+						{
+							Name: "docker",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/usr/bin/docker",
+									Type: hostPathTypePtr(corev1.HostPathFile),
+								},
+							},
+						},
 						{
 							Name: "dockershim",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
 									Path: "/var/run/dockershim.sock",
+									Type: hostPathTypePtr(corev1.HostPathSocket),
+								},
+							},
+						},
+						// for the upgrade before 1.24
+						{
+							Name: "dockersocket",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/var/run/docker.sock",
 									Type: hostPathTypePtr(corev1.HostPathSocket),
 								},
 							},
@@ -242,6 +300,16 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 								HostPath: &corev1.HostPathVolumeSource{
 									Path: "/var/lib/etcd",
 									Type: hostPathTypePtr(corev1.HostPathDirectory),
+								},
+							},
+						},
+						{
+							Name: "ssh-secret",
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName:  "ssh-key-secret",
+									DefaultMode: func(i int32) *int32 { return &i }(256), // 0400 in OCT
+									Optional:    func(i bool) *bool { return &i }(true),
 								},
 							},
 						},
