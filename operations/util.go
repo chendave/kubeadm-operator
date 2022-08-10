@@ -81,6 +81,7 @@ func setCP1Selector(t *operatorv1.RuntimeTaskGroup) {
 	t.Spec.NodeFilter = string(operatorv1.RuntimeTaskGroupNodeFilterHead)
 }
 
+// TODO: list the node by either "node-role.kubernetes.io/master" or "node-role.kubernetes.io/control-plane".
 func setCPNSelector(t *operatorv1.RuntimeTaskGroup) {
 	t.Spec.NodeSelector = metav1.LabelSelector{
 		MatchLabels: map[string]string{
@@ -95,6 +96,11 @@ func setWSelector(t *operatorv1.RuntimeTaskGroup) {
 		MatchExpressions: []metav1.LabelSelectorRequirement{
 			{
 				Key:      "node-role.kubernetes.io/master",
+				Operator: metav1.LabelSelectorOpDoesNotExist,
+			},
+			// for kubernetes 1.24 and after
+			{
+				Key:      "node-role.kubernetes.io/control-plane",
 				Operator: metav1.LabelSelectorOpDoesNotExist,
 			},
 		},

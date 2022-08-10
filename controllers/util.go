@@ -129,6 +129,8 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 							Command: []string{
 								"/manager",
 							},
+							// if your image is managed by containerd, you need to import the docker image to the k8s.io namespace
+							// list the image by: ctr --namespace=k8s.io image ls
 							ImagePullPolicy: "IfNotPresent",
 							Args: []string{
 								"--mode=agent",
@@ -191,6 +193,10 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 								{
 									Name:      "dockersocket",
 									MountPath: "/var/run/docker.sock",
+								},
+								{
+									Name:      "containerdsocket",
+									MountPath: "/run/containerd/containerd.sock",
 								},
 								// for etcd backup
 								{
@@ -290,6 +296,15 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
 									Path: "/var/run/docker.sock",
+									Type: hostPathTypePtr(corev1.HostPathSocket),
+								},
+							},
+						},
+						{
+							Name: "containerdsocket",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/run/containerd/containerd.sock",
 									Type: hostPathTypePtr(corev1.HostPathSocket),
 								},
 							},
