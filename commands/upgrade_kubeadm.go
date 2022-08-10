@@ -31,6 +31,7 @@ import (
 	operatorv1 "k8s.io/kubeadm/operator/api/v1alpha1"
 )
 
+// e.g. https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kubeadm
 const kubeadmDownloadPath = "https://storage.googleapis.com/kubernetes-release/release/%s/bin/linux/%s/kubeadm"
 
 func runUpgradeKubeadm(spec *operatorv1.UpgradeKubeadmCommandSpec, log logr.Logger) error {

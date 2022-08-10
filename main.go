@@ -75,9 +75,6 @@ func main() {
 	flag.BoolVar(&metricsRBAC, "agent-metrics-rbac", true, "Use RBAC authn/z for the /metrics endpoint of agents")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager")
-
-	// agent flags, Dave... this agent is target to run on this node, so it will ignore the task that is not targeting on this node.
-	// Dave... since this is a daemonset, it assuem to run on each of the nodes. what's this meaning?
 	flag.StringVar(&nodeName, "agent-node-name", "", "The node that the agent manager should control")
 	flag.StringVar(&operation, "agent-operation", "", "The operation that the agent manager should control. If empty, the agent will control headless Task only")
 

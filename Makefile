@@ -43,7 +43,9 @@ debug: manifests
 	kustomize build config/debug | kubectl create -f -
 
 baremetal:
-	go run manager --mode=manager --manager-pod=baremetal --manager-namespace=operator-system --agent-image=jungler/controller:latest --agent-metrics-rbac=false
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o manager main.go
+	#./manager --mode=manager --manager-pod=baremetal --manager-namespace=operator-system --agent-image=jungler/controller:latest --agent-metrics-rbac=false
+	./manager --mode=manager --manager-pod=baremetal --manager-namespace=operator-system --agent-image=jungler/controller:latest
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen
