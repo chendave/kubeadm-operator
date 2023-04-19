@@ -27,6 +27,10 @@ type OperatorDescriptor struct {
 	// +optional
 	RenewCertificates *RenewCertificatesOperationSpec `json:"renewCertificates,omitempty"`
 
+	// CaRotation privides specs for the whole CA rotation.
+	// +optional
+	CaRotaion *CaRotationOperationSpec `json:"caRotation,omitempty"`
+
 	// CustomOperation enable definition of custom list of RuntimeTaskGroup.
 	// +optional
 	CustomOperation *CustomOperationSpec `json:"custom,omitempty"`
@@ -54,6 +58,49 @@ type UpgradeOperationSpec struct {
 type RenewCertificatesOperationSpec struct {
 	Args string `json:"args"`
 	Cmd  string `json:"cmd"`
+}
+
+// CaRotationOperationSpec provides certs for ca-rotation workflow.
+type CaRotationOperationSpec struct {
+	// KubernetesVersion specifies the target kubernetes version
+	KubernetesVersion string `json:"kubernetesVersion"`
+	// PhaseNumber provides 1 or 2 to decide which phase to run
+	PhaseNumber int `json:"phaseNumber"`
+	// Nodelist provides all node's name
+	NodeList []string `json:"nodeList,omitempty"`
+	// NewCaCert provides a new trust root certificate authority
+	// +optional
+	NewCaCert []byte `json:"newCaCert,omitempty"`
+	// NewCaKey provides private key of new root certificate authority
+	// +optional
+	NewCaKey []byte `json:"newCaKey,omitempty"`
+	// CaBundle includes both old and new root certificate authority
+	// +optional
+	CaBundle []byte `json:"caBundle,omitempty"`
+	// NewKubeletCerts provides client certs of all kubelets
+	// +optional
+	NewKubeletClientCerts map[string]*CertPair `json:"newKubeletClientCerts,omitempty"`
+}
+
+// Certipair stores cert and private key
+type CertPair struct {
+	// +optional
+	Certificate []byte `json:"certificate,omitempty"`
+	// +optonal
+	PrivateKey []byte `json:"privateKey,omitempty"`
+}
+
+type ModifyConfigsSpec struct {
+	// FlagsPatchs provides the added and modified args of K8s component
+	// +optional
+	FlagsPatchs []FlagsPatchSpec `json:"flagsPatchs,omitempty"`
+}
+
+type FlagsPatchSpec struct {
+	// The name of the component whose parameters need to be modified
+	Name string `json:"name"`
+	// FlagsPatch provides parameters that need to be added or modified
+	FlagsPatch map[string]string `json:"flagsPatch,omitempty"`
 }
 
 // CustomOperationSpec enable definition of custom list of RuntimeTaskGroup.

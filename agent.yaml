@@ -70,7 +70,7 @@ spec:
     - --upstream=http://127.0.0.1:8080/
     - --logtostderr=true
     - --v=10
-    image: gcr.io/kubebuilder/kube-rbac-proxy:v0.4.0
+    image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.0
     imagePullPolicy: IfNotPresent
     name: kube-rbac-proxy
     ports:
@@ -179,7 +179,7 @@ status:
       running:
         startedAt: "2022-03-23T08:41:33Z"
   - containerID: docker://24bc965fa5ca6ccd9484daee9f5d4aac6f40354c16c1bdf59f4288198c6e2dec
-    image: gcr.io/kubebuilder/kube-rbac-proxy:v0.4.0
+    image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.0
     imageID: docker-pullable://gcr.io/kubebuilder/kube-rbac-proxy@sha256:297896d96b827bbcb1abd696da1b2d81cab88359ac34cce0e8281f266b4e08de
     lastState: {}
     name: kube-rbac-proxy

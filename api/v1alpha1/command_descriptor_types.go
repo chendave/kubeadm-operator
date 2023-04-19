@@ -44,6 +44,36 @@ type CommandDescriptor struct {
 	// +optional
 	KubectlUncordon *KubectlUncordonCommandSpec `json:"kubectlUncordon,omitempty"`
 
+	// +optional
+	WriteNewRootCaToDisk *WriteNewRootCaToDiskSpec `json:"writeNewRootCaToDisk,omitempty"`
+
+	// +optional
+	RestartControllerManager *RestartControllerManagerSpec `json:"restartControllerManager,omitempty"`
+
+	// +optional
+	RestartControlPlaneComponent *RestartControlPlaneComponentSpec `json:"restartControlPlaneComponent,omitempty"`
+
+	// +optional
+	RestartKubeproxyAndCoredns *RestartKubeproxyAndCorednsSpec `json:"restartKubeproxyAndCoredns,omitempty"`
+
+	// +optional
+	UpdateUserAccount *UpdateUserAccountSpec `json:"updateUserAccount,omitempty"`
+
+	// +optional
+	UpdateApiserverCerts *UpdateApiserverCertsSpec `json:"updateApiserverCerts,omitempty"`
+
+	// +optinal
+	RemoveOldRootCaFromDisk *RemoveOldRootCaFromDiskSpec `json:"removeOldRootCaFromDisk,omitempty"`
+
+	// +optional
+	RemoveOldCaInTokensAndSecrets *RemoveOldCaInTokensAndSecretsSpec `json:"removeOldCaInTokensAndSecrets,omitempty"`
+
+	// +optional
+	WriteNewKubeletCert *WriteNewKubeletCertSpec `json:"writeNewKubeletCert,omitempty"`
+
+	// +optional
+	RemoveOldCaFromKubeletConfig *RemoveOldCaFromKubeletConfigSpec `json:"removeOldCaOnNodes,omitempty"`
+
 	// Pass provide a dummy command for testing the kubeadm-operator workflow.
 	// +optional
 	Pass *PassCommandSpec `json:"pass,omitempty"`
@@ -107,6 +137,65 @@ type UpgradeKubeletAndKubeactlCommandSpec struct {
 type KubeadmRenewCertsCommandSpec struct {
 	Args string `json:"args"`
 	Cmd  string `json:"cmd"`
+}
+
+// WriteNewRootCaToDiskSpec provides fields to distribute new root ca to all controller planes.
+type WriteNewRootCaToDiskSpec struct {
+	// +optional
+	CaRotationOperation *CaRotationOperationSpec `json:"caRotationOperation,omitempty"`
+}
+
+// RemoveOldRootCaFromDiskSpec provides fields to replace old root ca on disk.
+type RemoveOldRootCaFromDiskSpec struct {
+	// +optional
+	CaRotationOperation *CaRotationOperationSpec `json:"caRotationOperation,omitempty"`
+}
+
+// RestartControllerManagerSpec provides args to decide whether use ca bundle or only new ca.
+type RestartControllerManagerSpec struct {
+	// +optional
+	WithCaBundle bool `json:"withCaBundle"`
+	// +optional
+	RemoveOldCaInBundle bool `json:"removeOldCaInBundle"`
+}
+
+// RestartControlPlaneComponentSpec provides name of control plane component to restart
+type RestartControlPlaneComponentSpec struct {
+	ComponentName string `json:"componentName,omitempty"`
+}
+
+// RestartKubeproxyAndCorednsSpec provides fields help restart kube-proxy and coredns.
+type RestartKubeproxyAndCorednsSpec struct {
+}
+
+type UpdateUserAccountSpec struct {
+	// +optional
+	Regenerate bool `json:"update,omitempty"`
+	// KubernetesVersion specifies the target kubernetes version
+	KubernetesVersion string `json:"kubernetesVersion"`
+}
+
+type UpdateApiserverCertsSpec struct {
+}
+
+type RemoveOldCaInTokensAndSecretsSpec struct {
+}
+
+type CreateAllNewKubeletClientCertsSpec struct {
+	// +optional
+	CaRotationOperation *CaRotationOperationSpec `json:"caRotationOperation,omitempty"`
+	// +optional
+	NodeList []string `json:"nodeList,omitempty"`
+}
+
+type WriteNewKubeletCertSpec struct {
+	// +optional
+	CaRotationOperation *CaRotationOperationSpec `json:"caRotationOperation,omitempty"`
+}
+
+type RemoveOldCaFromKubeletConfigSpec struct {
+	// +optional
+	NewCaCert []byte `json:"newCaCert,omitempty"`
 }
 
 // PassCommandSpec provide a dummy command for testing the kubeadm-operator workflow.

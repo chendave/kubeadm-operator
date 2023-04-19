@@ -32,6 +32,10 @@ func DaemonSetNodeSelectorLabels(operation *operatorv1.Operation) (map[string]st
 		return setupUpgrade(), nil
 	}
 
+	if operation.Spec.CaRotaion != nil {
+		return setupCaRotation(), nil
+	}
+
 	if operation.Spec.CustomOperation != nil {
 		return setupCustom(), nil
 	}
@@ -47,6 +51,10 @@ func TaskGroupList(operation *operatorv1.Operation) (*operatorv1.RuntimeTaskGrou
 
 	if operation.Spec.Upgrade != nil {
 		return planUpgrade(operation, operation.Spec.Upgrade), nil
+	}
+
+	if operation.Spec.CaRotaion != nil {
+		return planCaRotation(operation, operation.Spec.CaRotaion), nil
 	}
 
 	if operation.Spec.CustomOperation != nil {

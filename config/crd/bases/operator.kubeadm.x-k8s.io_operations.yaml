@@ -53,6 +53,53 @@ spec:
               completed, the operator will stop to reconcile on any instance of this
               object.
             properties:
+              caRotation:
+                description: CaRotation privides specs for the whole CA rotation.
+                properties:
+                  caBundle:
+                    description: CaBundle includes both old and new root certificate
+                      authority
+                    format: byte
+                    type: string
+                  kubernetesVersion:
+                    description: KubernetesVersion specifies the target kubernetes
+                      version
+                    type: string
+                  newCaCert:
+                    description: NewCaCert provides a new trust root certificate authority
+                    format: byte
+                    type: string
+                  newCaKey:
+                    description: NewCaKey provides private key of new root certificate
+                      authority
+                    format: byte
+                    type: string
+                  newKubeletCerts:
+                    additionalProperties:
+                      description: Certipair stores cert and private key
+                      properties:
+                        certificate:
+                          format: byte
+                          type: string
+                        privateKey:
+                          format: byte
+                          type: string
+                      type: object
+                    description: NewKubeletCerts provides client certs of all kubelets
+                    type: object
+                  nodeList:
+                    description: Nodelist provides all node's name
+                    items:
+                      type: string
+                    type: array
+                  phaseNumber:
+                    description: PhaseNumber provides 1 or 2 to decide which phase
+                      to run
+                    type: integer
+                required:
+                - kubernetesVersion
+                - phaseNumber
+                type: object
               custom:
                 description: CustomOperation enable definition of custom list of RuntimeTaskGroup.
                 properties:
@@ -263,6 +310,113 @@ spec:
                                           preflight:
                                             description: PreflightCommandSpec provides...
                                             type: object
+                                          removeOldCaInTokensAndSecrets:
+                                            type: object
+                                          removeOldCaOnNodes:
+                                            properties:
+                                              newCaCert:
+                                                format: byte
+                                                type: string
+                                            type: object
+                                          removeOldRootCaFromDisk:
+                                            description: RemoveOldRootCaFromDiskSpec
+                                              provides fields to replace old root
+                                              ca on disk.
+                                            properties:
+                                              caRotationOperation:
+                                                description: CaRotationOperationSpec
+                                                  provides certs for ca-rotation workflow.
+                                                properties:
+                                                  caBundle:
+                                                    description: CaBundle includes
+                                                      both old and new root certificate
+                                                      authority
+                                                    format: byte
+                                                    type: string
+                                                  kubernetesVersion:
+                                                    description: KubernetesVersion
+                                                      specifies the target kubernetes
+                                                      version
+                                                    type: string
+                                                  newCaCert:
+                                                    description: NewCaCert provides
+                                                      a new trust root certificate
+                                                      authority
+                                                    format: byte
+                                                    type: string
+                                                  newCaKey:
+                                                    description: NewCaKey provides
+                                                      private key of new root certificate
+                                                      authority
+                                                    format: byte
+                                                    type: string
+                                                  newKubeletCerts:
+                                                    additionalProperties:
+                                                      description: Certipair stores
+                                                        cert and private key
+                                                      properties:
+                                                        certificate:
+                                                          format: byte
+                                                          type: string
+                                                        privateKey:
+                                                          format: byte
+                                                          type: string
+                                                      type: object
+                                                    description: NewKubeletCerts provides
+                                                      client certs of all kubelets
+                                                    type: object
+                                                  nodeList:
+                                                    description: Nodelist provides
+                                                      all node's name
+                                                    items:
+                                                      type: string
+                                                    type: array
+                                                  phaseNumber:
+                                                    description: PhaseNumber provides
+                                                      1 or 2 to decide which phase
+                                                      to run
+                                                    type: integer
+                                                required:
+                                                - kubernetesVersion
+                                                - phaseNumber
+                                                type: object
+                                            type: object
+                                          restartControlPlaneComponent:
+                                            description: RestartControlPlaneComponentSpec
+                                              provides name of control plane component
+                                              to restart
+                                            properties:
+                                              componentName:
+                                                type: string
+                                            type: object
+                                          restartControllerManager:
+                                            description: RestartControllerManagerSpec
+                                              provides args to decide whether use
+                                              ca bundle or only new ca.
+                                            properties:
+                                              removeOldCaInBundle:
+                                                type: boolean
+                                              withCaBundle:
+                                                type: boolean
+                                            type: object
+                                          restartKubeproxyAndCoredns:
+                                            description: RestartKubeproxyAndCorednsSpec
+                                              provides fields help restart kube-proxy
+                                              and coredns.
+                                            type: object
+                                          updateApiserverCerts:
+                                            type: object
+                                          updateUserAccount:
+                                            properties:
+                                              kubernetesVersion:
+                                                description: KubernetesVersion specifies
+                                                  the target kubernetes version
+                                                type: string
+                                              update:
+                                                type: boolean
+                                            required:
+                                            - kubernetesVersion
+                                            type: object
                                           upgradeKubeadm:
                                             description: UpgradeKubeadmCommandSpec
                                               provides kubeadm's target version to
@@ -298,6 +452,129 @@ spec:
                                                   next command.
                                                 format: int32
                                                 type: integer
+                                            type: object
+                                          writeNewKubeletClientCerts:
+                                            properties:
+                                              caRotationOperation:
+                                                description: CaRotationOperationSpec
+                                                  provides certs for ca-rotation workflow.
+                                                properties:
+                                                  caBundle:
+                                                    description: CaBundle includes
+                                                      both old and new root certificate
+                                                      authority
+                                                    format: byte
+                                                    type: string
+                                                  kubernetesVersion:
+                                                    description: KubernetesVersion
+                                                      specifies the target kubernetes
+                                                      version
+                                                    type: string
+                                                  newCaCert:
+                                                    description: NewCaCert provides
+                                                      a new trust root certificate
+                                                      authority
+                                                    format: byte
+                                                    type: string
+                                                  newCaKey:
+                                                    description: NewCaKey provides
+                                                      private key of new root certificate
+                                                      authority
+                                                    format: byte
+                                                    type: string
+                                                  newKubeletCerts:
+                                                    additionalProperties:
+                                                      description: Certipair stores
+                                                        cert and private key
+                                                      properties:
+                                                        certificate:
+                                                          format: byte
+                                                          type: string
+                                                        privateKey:
+                                                          format: byte
+                                                          type: string
+                                                      type: object
+                                                    description: NewKubeletCerts provides
+                                                      client certs of all kubelets
+                                                    type: object
+                                                  nodeList:
+                                                    description: Nodelist provides
+                                                      all node's name
+                                                    items:
+                                                      type: string
+                                                    type: array
+                                                  phaseNumber:
+                                                    description: PhaseNumber provides
+                                                      1 or 2 to decide which phase
+                                                      to run
+                                                    type: integer
+                                                required:
+                                                - kubernetesVersion
+                                                - phaseNumber
+                                                type: object
+                                            type: object
+                                          writeNewRootCa:
+                                            description: WriteNewRootCaToDiskSpec
+                                              provides fields to distribute new root
+                                              ca to all controller planes.
+                                            properties:
+                                              caRotationOperation:
+                                                description: CaRotationOperationSpec
+                                                  provides certs for ca-rotation workflow.
+                                                properties:
+                                                  caBundle:
+                                                    description: CaBundle includes
+                                                      both old and new root certificate
+                                                      authority
+                                                    format: byte
+                                                    type: string
+                                                  kubernetesVersion:
+                                                    description: KubernetesVersion
+                                                      specifies the target kubernetes
+                                                      version
+                                                    type: string
+                                                  newCaCert:
+                                                    description: NewCaCert provides
+                                                      a new trust root certificate
+                                                      authority
+                                                    format: byte
+                                                    type: string
+                                                  newCaKey:
+                                                    description: NewCaKey provides
+                                                      private key of new root certificate
+                                                      authority
+                                                    format: byte
+                                                    type: string
+                                                  newKubeletCerts:
+                                                    additionalProperties:
+                                                      description: Certipair stores
+                                                        cert and private key
+                                                      properties:
+                                                        certificate:
+                                                          format: byte
+                                                          type: string
+                                                        privateKey:
+                                                          format: byte
+                                                          type: string
+                                                      type: object
+                                                    description: NewKubeletCerts provides
+                                                      client certs of all kubelets
+                                                    type: object
+                                                  nodeList:
+                                                    description: Nodelist provides
+                                                      all node's name
+                                                    items:
+                                                      type: string
+                                                    type: array
+                                                  phaseNumber:
+                                                    description: PhaseNumber provides
+                                                      1 or 2 to decide which phase
+                                                      to run
+                                                    type: integer
+                                                required:
+                                                - kubernetesVersion
+                                                - phaseNumber
+                                                type: object
                                             type: object
                                         type: object
                                       type: array

@@ -4,5 +4,16 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 images:
 - name: controller
-  newName: controller
+  newName: docker.io/jungler/controller
   newTag: latest
+configMapGenerator:
+- files:
+  - /etc/kubernetes/pki/ca.crt
+  name: ca-bundle
+  namespace: operator-system
+generatorOptions:
+  annotations:
+    note: generated
+  disableNameSuffixHash: true
+  labels:
+    type: generated

@@ -118,7 +118,7 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 				Spec: corev1.PodSpec{
 					Tolerations: []corev1.Toleration{
 						{
-							Key:    "node-role.kubernetes.io/master",
+							Key:    "node-role.kubernetes.io/control-plane",
 							Effect: corev1.TaintEffectNoSchedule,
 						},
 					},
@@ -143,6 +143,14 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 									ValueFrom: &corev1.EnvVarSource{
 										FieldRef: &corev1.ObjectFieldSelector{
 											FieldPath: "spec.nodeName",
+										},
+									},
+								},
+								{
+									Name: "MY_NODE_IP",
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											FieldPath: "status.hostIP",
 										},
 									},
 								},
@@ -210,6 +218,11 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 								{
 									Name:      "ssh-secret",
 									MountPath: "/root/.ssh",
+								},
+								{
+									Name:      "ca-bundle",
+									MountPath: "/ca.crt",
+									SubPath:   "ca.crt",
 								},
 							},
 						},
@@ -323,8 +336,19 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
 									SecretName:  "ssh-key-secret",
-									DefaultMode: func(i int32) *int32 { return &i }(256), // 0400 in OCT
-									Optional:    func(i bool) *bool { return &i }(true),
+									DefaultMode: int32Ptr(256), // 0400 in OCT
+									Optional:    boolPtr(true),
+								},
+							},
+						},
+						{
+							Name: "ca-bundle",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "operator-ca-bundle",
+									},
+									Optional: boolPtr(true),
 								},
 							},
 						},
@@ -352,10 +376,12 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 		daemonSet.Spec.Template.Spec.Containers = append(daemonSet.Spec.Template.Spec.Containers,
 			corev1.Container{
 				Name:  "kube-rbac-proxy",
-				Image: "gcr.io/kubebuilder/kube-rbac-proxy:v0.4.0",
+				Image: "gcr.io/kubebuilder/kube-rbac-proxy:v0.13.0",
 				Args: []string{
+					"--client-ca-file=/ca.crt",
 					"--secure-listen-address=0.0.0.0:8443",
 					"--upstream=http://127.0.0.1:8080/",
+					"--upstream-ca-file=/ca.crt",
 					"--logtostderr=true",
 					"--v=10",
 				},
@@ -363,6 +389,13 @@ func createDaemonSet(c client.Client, operation *operatorv1.Operation, namespace
 					{
 						ContainerPort: 8443,
 						Name:          "https",
+					},
+				},
+				VolumeMounts: []corev1.VolumeMount{
+					{
+						Name:      "ca-bundle",
+						MountPath: "/ca.crt",
+						SubPath:   "ca.crt",
 					},
 				},
 			},
@@ -522,7 +555,6 @@ func listTasksBySelector(c client.Client, selector *metav1.LabelSelector) (*oper
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert TaskGroup.Spec.Selector to a selector")
 	}
-
 	tasks := &operatorv1.RuntimeTaskList{}
 	if err := c.List(
 		context.Background(), tasks,
@@ -570,4 +602,12 @@ func getOwnerTaskGroup(ctx context.Context, c client.Client, obj metav1.ObjectMe
 		}
 	}
 	return nil, errors.Errorf("missing controller ref for %s/%s", obj.Namespace, obj.Name)
+}
+
+func int32Ptr(i int32) *int32 {
+	return &i
+}
+
+func boolPtr(b bool) *bool {
+	return &b
 }

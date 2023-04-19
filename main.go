@@ -18,12 +18,16 @@ package main
 
 import (
 	"flag"
+	"io/ioutil"
+	"net"
 	"os"
 
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	"k8s.io/client-go/rest"
+	certutil "k8s.io/client-go/util/cert"
 	klog "k8s.io/klog/v2"
 	"k8s.io/klog/v2/klogr"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -94,7 +98,7 @@ func main() {
 	// TODO: enable LeaderElection and delete this line
 	enableLeaderElection = false
 
-	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+	mgr, err := ctrl.NewManager(helperGetConfig(), ctrl.Options{
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
@@ -158,5 +162,36 @@ func main() {
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
+	}
+}
+
+func helperGetConfig() *rest.Config {
+	const (
+		tokenFile  = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+		rootCAFile = "/ca.crt"
+	)
+	host, port := os.Getenv("KUBERNETES_SERVICE_HOST"), os.Getenv("KUBERNETES_SERVICE_PORT")
+	if len(host) == 0 || len(port) == 0 {
+		return nil
+	}
+
+	token, err := ioutil.ReadFile(tokenFile)
+	if err != nil {
+		return nil
+	}
+
+	tlsClientConfig := rest.TLSClientConfig{}
+
+	if _, err := certutil.NewPool(rootCAFile); err != nil {
+		klog.Errorf("Expected to load root CA config from %s, but got err: %v", rootCAFile, err)
+	} else {
+		tlsClientConfig.CAFile = rootCAFile
+	}
+
+	return &rest.Config{
+		Host:            "https://" + net.JoinHostPort(host, port),
+		TLSClientConfig: tlsClientConfig,
+		BearerToken:     string(token),
+		BearerTokenFile: tokenFile,
 	}
 }

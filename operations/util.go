@@ -67,7 +67,7 @@ func createBasicTaskGroup(operation *operatorv1.Operation, taskdeploymentOrder s
 func setCPSelector(t *operatorv1.RuntimeTaskGroup) {
 	t.Spec.NodeSelector = metav1.LabelSelector{
 		MatchLabels: map[string]string{
-			"node-role.kubernetes.io/master": "",
+			"node-role.kubernetes.io/control-plane": "",
 		},
 	}
 }
@@ -75,7 +75,7 @@ func setCPSelector(t *operatorv1.RuntimeTaskGroup) {
 func setCP1Selector(t *operatorv1.RuntimeTaskGroup) {
 	t.Spec.NodeSelector = metav1.LabelSelector{
 		MatchLabels: map[string]string{
-			"node-role.kubernetes.io/master": "",
+			"node-role.kubernetes.io/control-plane": "",
 		},
 	}
 	t.Spec.NodeFilter = string(operatorv1.RuntimeTaskGroupNodeFilterHead)
@@ -85,7 +85,7 @@ func setCP1Selector(t *operatorv1.RuntimeTaskGroup) {
 func setCPNSelector(t *operatorv1.RuntimeTaskGroup) {
 	t.Spec.NodeSelector = metav1.LabelSelector{
 		MatchLabels: map[string]string{
-			"node-role.kubernetes.io/master": "",
+			"node-role.kubernetes.io/control-plane": "",
 		},
 	}
 	t.Spec.NodeFilter = string(operatorv1.RuntimeTaskGroupNodeFilterTail)

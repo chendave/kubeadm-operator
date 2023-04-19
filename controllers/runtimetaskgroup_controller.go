@@ -275,6 +275,10 @@ func (r *RuntimeTaskGroupReconciler) createTasksReplica(executionMode operatorv1
 		paused = true
 	}
 
+	labels := taskgroup.Spec.Template.Labels
+	if len(labels) == 0 {
+		labels = taskgroup.Labels
+	}
 	task := &operatorv1.RuntimeTask{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "RuntimeTask",
@@ -283,7 +287,7 @@ func (r *RuntimeTaskGroupReconciler) createTasksReplica(executionMode operatorv1
 		ObjectMeta: metav1.ObjectMeta{
 			Name:            fmt.Sprintf("%s-%s", taskgroup.Name, nodeName), //TODO: GeneratedName?
 			Namespace:       taskgroup.Namespace,
-			Labels:          taskgroup.Spec.Template.Labels,
+			Labels:          labels,
 			Annotations:     taskgroup.Spec.Template.Annotations,
 			OwnerReferences: []metav1.OwnerReference{*metav1.NewControllerRef(taskgroup, taskgroup.GroupVersionKind())},
 		},

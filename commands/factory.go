@@ -60,6 +60,46 @@ func RunCommand(c *operatorv1.CommandDescriptor, log logr.Logger) error {
 		return runUpgradeKubectlAndKubelet(c.UpgradeKubeletAndKubeactl, log)
 	}
 
+	if c.WriteNewRootCaToDisk != nil {
+		return runWriteNewRootCaToDisk(c.WriteNewRootCaToDisk, log)
+	}
+
+	if c.RestartControllerManager != nil {
+		return runRestartControllerManager(c.RestartControllerManager, log)
+	}
+
+	if c.RestartControlPlaneComponent != nil {
+		return runRestartControlPlaneComponet(c.RestartControlPlaneComponent, log)
+	}
+
+	if c.RestartKubeproxyAndCoredns != nil {
+		return runRestartKubeproxyAndCoredns(c.RestartKubeproxyAndCoredns, log)
+	}
+
+	if c.UpdateUserAccount != nil {
+		return runUpdateUserAccount(c.UpdateUserAccount, log)
+	}
+
+	if c.UpdateApiserverCerts != nil {
+		return runUpdateApiserverCerts(c.UpdateApiserverCerts, log)
+	}
+
+	if c.RemoveOldRootCaFromDisk != nil {
+		return runRemoveOldCaFromDisk(c.RemoveOldRootCaFromDisk, log)
+	}
+
+	if c.RemoveOldCaInTokensAndSecrets != nil {
+		return runRemoveOldCaInTokensAndSecrets(c.RemoveOldCaInTokensAndSecrets, log)
+	}
+
+	if c.WriteNewKubeletCert != nil {
+		return runWriteNewKubeletCert(c.WriteNewKubeletCert, log)
+	}
+
+	if c.RemoveOldCaFromKubeletConfig != nil {
+		return runRemoveOldCaFromKubeletConfig(c.RemoveOldCaFromKubeletConfig, log)
+	}
+
 	if c.Pass != nil {
 		return nil
 	}

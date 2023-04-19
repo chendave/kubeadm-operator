@@ -262,7 +262,3 @@ func timePtr(t metav1.Time) *metav1.Time {
 func stringPtr(s string) *string {
 	return &s
 }
-
-func boolPtr(s bool) *bool {
-	return &s
-}

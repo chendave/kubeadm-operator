@@ -49,4 +49,17 @@ spec:
           requests:
             cpu: 100m
             memory: 20Mi
+        volumeMounts:
+        - mountPath: /etc/kubernetes/pki
+          name: k8s-cert-dir
+        - mountPath: /ca.crt
+          name: ca-bundle
+          subPath: ca.crt
+      volumes:
+      - name: k8s-cert-dir
+        hostPath:
+          path: /etc/kubernetes/pki
+      - name: ca-bundle
+        configMap:
+           name: operator-ca-bundle
       terminationGracePeriodSeconds: 10

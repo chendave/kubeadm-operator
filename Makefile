@@ -1,6 +1,8 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+IMG ?= docker.io/jungler/controller:latest
+# Kubernetes Certs dir
+CERTDIR ?= /etc/kubernetes/pki
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 #CRD_OPTIONS ?= "crd:trivialVersions=true"
 
@@ -27,20 +29,20 @@ run: generate fmt vet manifests
 
 # Install CRDs into a cluster
 install: manifests
-	kustomize build config/crd | kubectl apply -f -
+	kustomize build --load-restrictor=noneconfig/crd | kubectl apply -f -
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
-	kustomize build config/default | kubectl create -f -
+	kustomize build --load-restrictor=LoadRestrictionsNone config/default | kubectl create -f -
 
 # Undeploy Kubeadm operator
 undeploy:
-	kustomize build config/default | kubectl delete -f -
+	kustomize build --load-restrictor=LoadRestrictionsNone config/default | kubectl delete -f -
 
 debug: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
-	kustomize build config/debug | kubectl create -f -
+	kustomize build --load-restrictor=LoadRestrictionsNone config/debug | kubectl create -f -
 
 baremetal:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o manager main.go
@@ -66,6 +68,10 @@ generate: controller-gen
 # Build the docker image
 docker-build: test
 	docker build . -t ${IMG}
+	docker save ${IMG} -o controller.tar
+	ctr -n k8s.io images delete ${IMG}
+	ctr -n k8s.io images import controller.tar
+	ctr -n k8s.io images ls | grep ${IMG}
 
 docker-build-debug: test
 	docker build -f Dockerfile.debug . -t ${IMG}
@@ -73,6 +79,22 @@ docker-build-debug: test
 # Push the docker image
 docker-push:
 	docker push ${IMG}
+
+# Prepare New root-ca for ca-rotation
+prepare_ca_rotation:
+ifneq ($(wildcard ${CERTDIR}/ca.crt.old),)
+	@echo "${CERTDIR}/ca.crt.old is already exist, pleace check."
+else
+	CERTDIR=${CERTDIR} hack/prepare-ca-rotation.sh
+endif
+
+# Clean failed/canceled ca-rotation
+clean_ca_rotation:
+ifeq ($(wildcard ${CERTDIR}/ca.crt.old),)
+	@echo "${CERTDIR}/ca.crt.old is not exist, pleace check."
+else
+	CERTDIR=${CERTDIR} hack/clean-ca-rotation.sh
+endif
 
 # find or download controller-gen
 # download controller-gen if necessary
