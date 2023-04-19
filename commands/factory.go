@@ -100,6 +100,10 @@ func RunCommand(c *operatorv1.CommandDescriptor, log logr.Logger) error {
 		return runRemoveOldCaFromKubeletConfig(c.RemoveOldCaFromKubeletConfig, log)
 	}
 
+	if c.ModifyConfigs != nil {
+		return runModifyConfigs(c.ModifyConfigs, log)
+	}
+
 	if c.Pass != nil {
 		return nil
 	}

@@ -1,0 +1,17 @@
+apiVersion: operator.kubeadm.x-k8s.io/v1alpha1
+kind: Operation
+metadata:
+  name: modifyconfigs
+spec:
+  executionMode: Auto
+  modifyConfigs:
+    flagsPatchs:
+    - name: kube-apiserver
+      flagsPatch:
+        log-flush-frequency: 10s
+    - name: kube-controller-manager
+      flagsPatch:
+        log-flush-frequency: 10s
+    - name: kube-scheduler
+      flagsPatch:
+        log-flush-frequency: 10s

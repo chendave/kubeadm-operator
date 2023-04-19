@@ -74,6 +74,9 @@ type CommandDescriptor struct {
 	// +optional
 	RemoveOldCaFromKubeletConfig *RemoveOldCaFromKubeletConfigSpec `json:"removeOldCaOnNodes,omitempty"`
 
+	// +optional
+	ModifyConfigs *ModifyConfigsSpec `json:"modifyConfigs,omitempty"`
+
 	// Pass provide a dummy command for testing the kubeadm-operator workflow.
 	// +optional
 	Pass *PassCommandSpec `json:"pass,omitempty"`

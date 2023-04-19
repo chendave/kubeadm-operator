@@ -93,6 +93,28 @@ spec:
                     kubectlUncordon:
                       description: KubectlUncordonCommandSpec provides...
                       type: object
+                    modifyConfigs:
+                      properties:
+                        flagsPatchs:
+                          description: FlagsPatchs provides the added and modified
+                            args of K8s component
+                          items:
+                            properties:
+                              flagsPatch:
+                                additionalProperties:
+                                  type: string
+                                description: FlagsPatch provides parameters that need
+                                  to be added or modified
+                                type: object
+                              name:
+                                description: The name of the component whose parameters
+                                  need to be modified
+                                type: string
+                            required:
+                            - name
+                            type: object
+                          type: array
+                      type: object
                     pass:
                       description: Pass provide a dummy command for testing the kubeadm-operator
                         workflow.
@@ -135,7 +157,7 @@ spec:
                                 certificate authority
                               format: byte
                               type: string
-                            newKubeletCerts:
+                            newKubeletClientCerts:
                               additionalProperties:
                                 description: Certipair stores cert and private key
                                 properties:
@@ -229,7 +251,7 @@ spec:
                           format: int32
                           type: integer
                       type: object
-                    writeNewKubeletClientCerts:
+                    writeNewKubeletCert:
                       properties:
                         caRotationOperation:
                           description: CaRotationOperationSpec provides certs for
@@ -254,7 +276,7 @@ spec:
                                 certificate authority
                               format: byte
                               type: string
-                            newKubeletCerts:
+                            newKubeletClientCerts:
                               additionalProperties:
                                 description: Certipair stores cert and private key
                                 properties:
@@ -282,7 +304,7 @@ spec:
                           - phaseNumber
                           type: object
                       type: object
-                    writeNewRootCa:
+                    writeNewRootCaToDisk:
                       description: WriteNewRootCaToDiskSpec provides fields to distribute
                         new root ca to all controller planes.
                       properties:
@@ -309,7 +331,7 @@ spec:
                                 certificate authority
                               format: byte
                               type: string
-                            newKubeletCerts:
+                            newKubeletClientCerts:
                               additionalProperties:
                                 description: Certipair stores cert and private key
                                 properties:

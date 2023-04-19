@@ -19,6 +19,7 @@ package commands
 import (
 	"io/ioutil"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/go-logr/logr"
@@ -50,16 +51,16 @@ func runRestartControllerManager(spec *operatorv1.RestartControllerManagerSpec, 
 		return err
 	}
 
-	var argPatch map[string]string
+	var cmFlagsPatch map[string]string
 	if !spec.RemoveOldCaInBundle && spec.WithCaBundle {
-		argPatch = map[string]string{
-			"--client-ca-file":            "/etc/kubernetes/pki/ca.crt.new",
-			"--cluster-signing-cert-file": "/etc/kubernetes/pki/ca.crt.new",
+		cmFlagsPatch = map[string]string{
+			"client-ca-file":            "/etc/kubernetes/pki/ca.crt.new",
+			"cluster-signing-cert-file": "/etc/kubernetes/pki/ca.crt.new",
 		}
 	} else if spec.RemoveOldCaInBundle && !spec.WithCaBundle {
-		argPatch = map[string]string{
-			"--client-ca-file":            "/etc/kubernetes/pki/ca.crt",
-			"--cluster-signing-cert-file": "/etc/kubernetes/pki/ca.crt",
+		cmFlagsPatch = map[string]string{
+			"client-ca-file":            "/etc/kubernetes/pki/ca.crt",
+			"cluster-signing-cert-file": "/etc/kubernetes/pki/ca.crt",
 		}
 	} else {
 		err = errors.New("Can't recognize pattern of Spec")
@@ -67,7 +68,7 @@ func runRestartControllerManager(spec *operatorv1.RestartControllerManagerSpec, 
 		return err
 	}
 
-	ReplaceArgs(&pod.Spec.Containers[0].Command, argPatch)
+	ReplaceFlags(&pod.Spec.Containers[0].Command, cmFlagsPatch)
 
 	newContent, err := yaml.Marshal(&pod)
 	if err != nil {
@@ -84,13 +85,31 @@ func runRestartControllerManager(spec *operatorv1.RestartControllerManagerSpec, 
 	return restartStaticPod("kube-controller-manager")
 }
 
-// ReplaceArgs applys the patchs to args
-func ReplaceArgs(args *[]string, patchs map[string]string) error {
-	for i := range *args {
-		key := strings.Split((*args)[i], "=")[0]
+// ReplaceFlags applys the patchs to flags
+func ReplaceFlags(flags *[]string, patchs map[string]string) error {
+	// for existing flags, patch flags in place
+	for i := range *flags {
+		key := strings.Split((*flags)[i], "=")[0]
+
+		// Remove leading "--" from flag:
+		key = removeLeadingDashesFromString(key)
 		if val, ok := patchs[key]; ok {
-			(*args)[i] = key + "=" + val
+			(*flags)[i] = "--" + key + "=" + val
+			delete(patchs, key)
 		}
 	}
+
+	// add new lines for new flags
+	for key, value := range patchs {
+		*flags = append(*flags, "--"+key+"="+value)
+	}
+	sort.Strings((*flags)[1:])
 	return nil
+}
+
+func removeLeadingDashesFromString(str string) string {
+	if len(str) > 2 && str[0] == '-' && str[1] == '-' {
+		return str[2:]
+	}
+	return str
 }

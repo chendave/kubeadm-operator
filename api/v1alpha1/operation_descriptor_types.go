@@ -31,6 +31,10 @@ type OperatorDescriptor struct {
 	// +optional
 	CaRotaion *CaRotationOperationSpec `json:"caRotation,omitempty"`
 
+	// ModifyConfigs provides component name and args to be modified in cluster.
+	// +optional
+	ModifyConfigs *ModifyConfigsSpec `json:"modifyConfigs,omitempty"`
+
 	// CustomOperation enable definition of custom list of RuntimeTaskGroup.
 	// +optional
 	CustomOperation *CustomOperationSpec `json:"custom,omitempty"`
